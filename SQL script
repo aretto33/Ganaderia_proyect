@@ -1,0 +1,23 @@
+SHOW DATABASES;
+
+CREATE DATABASE IF NOT EXISTS Proyecto_Ganaderia;
+USE Proyecto_Ganadaria;
+--Un dato escencial es el registro de productor ya que al comprar o nacer un bovino, el productor es el responsable de su registro oficial
+CREATE TABLE Productores (
+  pk_productor INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(255),
+  apellido_pat VARCHAR(255),
+  apellido_mat VARCHAR(255),
+  fk_predio INT,
+  FOREIGN KEY (fk_predio) REFERENCES Predios(pk_predio)
+);
+--Predios, se registra el o los terrenos del propietario ya que es dato importante a la hora de mover un bovino o venderlo
+CREATE TABLE Predios(
+  pk_predio INT PRIMARY KEY AUTO_INCREMENT,
+  direccion VARCHAR(255),
+  estado VARCHAR(100) NOT NULL,
+  municipio VARCHAR(100) NOT NULL,
+);
+
+
+
