@@ -19,5 +19,58 @@ CREATE TABLE Predios(
   municipio VARCHAR(100) NOT NULL,
 );
 
+CREATE TABLE Razas (
+  pk_raza INT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL UNIQUE,
+  origen VARCHAR(100) DEFAULT 'Sin registro',
+  color VARCHAR(100) DEFAULT 'Sin definir'
+);
+
+CREATE TABLE Animales (
+  pk_animal INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  cruze TEXT,
+  foto_perfil VARBINARY,
+  foto_lateral VARBINARY,
+  fk_productor INT,
+  fk_raza INT,
+  FOREIGN KEY (fk_productor) REFERENCES Productores(pk_productor),
+  FOREIGN KEY (fk_raza) REFERENCES Razaz(pk_raza)
+);
+  
+CREATE TABLE Seguimiento_vet (
+  pk_segui_vet INT PRIMARY KEY NOY NULL AUTO_INCREMENT,
+  fk_animal INT,
+  tipo_tratamiento TEXT NOT NULL DEFAULT 'Chequeo',
+  fecha_actual DATE NOT NULL,
+  prox_fecha DATE,
+  FOREIGN KEY (fk_animal) REFERENCES Animal(pk_animal)
+)
+
+CREATE TABLE Registro_SINIGA (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    UPP INT NOT NULL,
+    fk_animal INT UNIQUE,
+    arete VARCHAR(100) NOT NULL,
+    FOREIGN KEY (fk_animal) REFERENCES Animales (pk_animal)
+);
+
+CREATE TABLE Pesajes (
+    pk_pesaje INT AUTO_INCREMENT PRIMARY KEY,
+    pesaje FLOAT NOT NULL,
+    fecha DATE NOT NULL,
+    fk_animal INT,
+    FOREIGN KEY (fk_animal) REFERENCES Animales(pk_animal)
+);
+CREATE TABLE Ventas (
+    pk_venta INT AUTO_INCREMENT PRIMARY KEY,
+    fk_animal INT,
+    fk_pesaje INT,
+    clave VARCHAR(50) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    fecha_venta DATE NOT NULL,
+    FOREIGN KEY (fk_animal) REFERENCES Animales(pk_animal),
+    FOREIGN KEY (fk_pesaje) REFERENCES Pesajes(pk_pesaje)
+);
 
 
