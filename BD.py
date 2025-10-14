@@ -18,9 +18,11 @@ class APP_BD(tk.Tk):
         self.title(APP_TITLE)
         self.geometry(WINDOW_SIZE)
         self.config(bg=BG)
-        self.menu_widgets()
 
+        self.menu_open = False # Estado del menú
+        self.menu_widgets()
         self.create_banner()
+
     def conectar_bd():
         try:
             conn = mariadb.connect(
@@ -60,25 +62,41 @@ class APP_BD(tk.Tk):
             banner_label.pack(fill="x")
 
     def menu_widgets(self):
-        self.side_panel_frame = tk.Frame(self.master, bg="lightblue", width=60)
+        self.side_panel_frame = tk.Frame(self, bg="#916D4C", width=60)
         self.side_panel_frame.pack(side="left", fill = "y")
-
-        self.menu_button = tk.Button(self.side_panel_frame, text="-")
+        #botón para abrir/cerrar menu
+        self.menu_button = tk.Button(
+        self.side_panel_frame,
+        text="≡",
+        bg="#916D4C",
+        command=self.toggle_menu)
         self.menu_button.pack(side="top", pady=10)
 
-    def toggle_menu():
+        self.menu_buttons = []
+        opciones = ["Animales","Predios","Productor","Pesaje", "Registro"]
+
+        for texto in opciones:
+            boton = tk.Button(
+                self.side_panel_frame,
+                text=texto,
+                bg="white",
+                relief="flat"
+            )
+            self.menu_buttons.append(boton)
+            #botones ocultos
+
+    def toggle_menu(self):
         if not self.menu_open:
-            self.button.pack(side="top", pady =5)
-
-
-
-
-
- 
-    
-
-
-
+            for boton in self.menu_buttons:
+                boton.pack(side="top", fill="x", pady=5, padx=5)
+                self.menu_open = True
+                self.menu_button.config(text="x")
+        else:
+             for boton in self.menu_buttons:
+                boton.pack_forget()
+                self.menu_open = False
+                self.menu_button.config(text="≡")
+            
 
 if __name__ == "__main__":
     app = APP_BD()
