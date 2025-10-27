@@ -3,6 +3,10 @@ from tkinter import Toplevel
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import mariadb
+from Ventana_Animal import Ventana_Animales
+from Ventana_Predio import Ventana_Predios
+from fpdf import FPDF
+import sys
 
 
 APP_TITLE = 'GANA_CONTROL'
@@ -38,12 +42,16 @@ class APP_BD(tk.Tk):
         except mariadb.Error as e:
             messagebox.showerror("Error de conexión", f"No se pudo conectar:\n{e}")
             return None, None
-   
+
+    usuario = sys.argv[1] if len(sys.argv) > 1 else "Desconocido"
+    rol = sys.argv[2] if len(sys.argv) > 2 else "Sin rol"
+    print(f"Inició sesión: {usuario} ({rol})")
 
     def create_banner(self):
         banner_frame = tk.Frame(self, bg=ACCENT)
         banner_frame.pack(fill="x")
 
+        tk.Label(self, text=f"🐮 Bienvenido {usuario} ({rol})", font=("Arial", 14, "bold"), bg=BG, fg="#2A3E75").pack(pady=10)
         try:
             img = Image.open("banner.png")
             img = img.resize((900, 180))
@@ -60,6 +68,10 @@ class APP_BD(tk.Tk):
                 height=3
             )
             banner_label.pack(fill="x")
+    
+
+# Recibir usuario y rol del login
+
 
     def menu_widgets(self):
         self.side_panel_frame = tk.Frame(self, bg="#916D4C", width=60)
@@ -73,14 +85,20 @@ class APP_BD(tk.Tk):
         self.menu_button.pack(side="top", pady=10)
 
         self.menu_buttons = []
-        opciones = ["Animales","Predios","Productor","Pesaje", "Registro"]
+        opciones = {"Animales":self.abrir_ventana_animales,
+                    "Predios":self.abrir_ventana_predio,
+                    "Productor": lambda: messagebox.showinfo("Info", "Ventana Productor aún no implementada"),
+                    "Pesaje": lambda: messagebox.showinfo("Info", "Ventana Pesaje aún no implementada"),
+                    "Registro": lambda: messagebox.showinfo("Info", "Ventana Registro aún no implementada")}
+    
 
-        for texto in opciones:
+        for texto,comando in opciones.items():
             boton = tk.Button(
                 self.side_panel_frame,
                 text=texto,
                 bg="white",
-                relief="flat"
+                relief="flat",
+                command=comando
             )
             self.menu_buttons.append(boton)
             #botones ocultos
@@ -96,7 +114,16 @@ class APP_BD(tk.Tk):
                 boton.pack_forget()
                 self.menu_open = False
                 self.menu_button.config(text="≡")
-            
+        
+    def abrir_ventana_animales(self):
+        ventana_animales = Ventana_Animales(self)
+        ventana_animales.grab_set()  # bloquea interacción con ventana principal mientras esté abierta
+        
+    def abrir_ventana_predio(self):
+        ventana_predio = Ventana_Predios(self)
+        ventana_predio.grab_set()  # bloquea interacción con ventana principal mientras esté abierta
+
+
 
 if __name__ == "__main__":
     app = APP_BD()
