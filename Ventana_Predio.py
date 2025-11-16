@@ -5,10 +5,12 @@ import mariadb
 
 # --- CONFIGURACIONES GENERALES ---
 APP_TITLE = 'Gestión de Predios'
-BG = "#f4f3ec"
-ACCENT = "#36448B"
-ACCENT_DARK = "#2A3E75"
-TEXT_COLOR = "#222"
+BG = "#e7d7c1"          # Fondo beige claro
+ACCENT = "#8b5e3c"      # Café medio
+ACCENT_DARK = "#6b452e" # Café oscuro
+TEXT_COLOR = "#000000"  # Café muy oscuro
+BTN_LIGHT = "#a9825a"   # Café claro
+BTN_DARK = "#7a563b"    # Café fuerte
 # --- Conexión a la base de datos ---
 def conectar_bd():
     try:
@@ -32,27 +34,7 @@ class Ventana_Predios(tk.Toplevel):  # ← hereda de Toplevel, no Frame
         self.title(APP_TITLE)
         self.geometry("700x500")
         self.config(bg=BG)
-
-        # --- PANEL DE BOTONES CRUD ---
-        panel = tk.Frame(self, bg=BG)
-        panel.pack(pady=10)
-
-        botones = [
-            ("Registrar Predio", ACCENT, self.registrar_predio),
-            ("Modificar Predio", ACCENT, self.modificar_predio),
-            ("Eliminar Predio", "#B33A3A", self.eliminar_predio),
-            ("Consultar Predio", ACCENT_DARK, self.consultar_predios)
-        ]
-
-        for texto, color, comando in botones:
-            tk.Button(
-                panel, text=texto, command=comando,
-                bg=color, fg="white", activebackground=ACCENT_DARK,
-                relief="flat", padx=16, pady=10,
-                font=("Arial", 10, "bold"), cursor="hand2", width=20
-            ).pack(pady=6)
-
-        # --- FORMULARIO ---
+# --- FORMULARIO ---
         form = tk.LabelFrame(
             self, text="Formulario de Predios",
             bg=BG, fg=ACCENT, font=("Arial", 12, "bold"),
@@ -74,6 +56,27 @@ class Ventana_Predios(tk.Toplevel):  # ← hereda de Toplevel, no Frame
             entry = tk.Entry(fila, width=40, relief="solid", justify="center")
             entry.pack(side="left", padx=10)
             self.campos_predio[campo] = entry
+            
+        # --- PANEL DE BOTONES CRUD ---
+        panel = tk.Frame(self, bg=BG)
+        panel.pack(pady=10)
+
+        botones = [
+            ("Registrar Predio", ACCENT, self.registrar_predio),
+            ("Modificar Predio", ACCENT, self.modificar_predio),
+            ("Eliminar Predio", "#B33A3A", self.eliminar_predio),
+            ("Consultar Predio", ACCENT_DARK, self.consultar_predios)
+        ]
+
+        for texto, color, comando in botones:
+            tk.Button(
+                panel, text=texto, command=comando,
+                bg=color, fg="white", activebackground=ACCENT_DARK,
+                relief="flat", padx=16, pady=10,
+                font=("Arial", 10, "bold"), cursor="hand2", width=20
+            ).pack(pady=6)
+
+        
 
         # --- BOTONES EXTRA ---
         acciones = tk.Frame(self, bg=BG)
@@ -106,7 +109,7 @@ class Ventana_Predios(tk.Toplevel):  # ← hereda de Toplevel, no Frame
                 messagebox.showwarning("Campos vacíos", "Debes ingresar nombre y fecha.")
                 return
 
-            sql = """INSERT INTO Predios (direccion, estado, municipio)
+            sql = """CALL registrarPredio (direccion, estado, municipio)
                      VALUES (%s, %s, %s)"""
             cursor.execute(sql, (direccion, estado, municipio))
             conn.commit()

@@ -8,9 +8,9 @@ import subprocess
 
 
 APP_TITLE = 'GANA_CONTROL'
-WINDOW_SIZE = "900x600"
+WINDOW_SIZE = "1500x1000"
 BG = "#f4f3ec"
-ACCENT = "#36448B"
+ACCENT = "#F1C59E"
 ACCENT_DARK = "#2A3E75"
 TEXT_COLOR = "#222"
 
@@ -66,6 +66,7 @@ class APP(tk.Tk):
 
         self.create_banner()
         self.create_navbar()
+        self.create_main_description()
 
     # --- Crear banner superior ---
     def create_banner(self):

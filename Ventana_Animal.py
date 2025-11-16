@@ -3,55 +3,39 @@ from tkinter import Toplevel, messagebox, simpledialog, ttk
 from PIL import Image, ImageTk
 import mariadb
 
-# --- CONFIGURACIONES GENERALES ---
+# --- CONFIGURACIONES GENERALES (PALETA CAFÉ) ---
 APP_TITLE = 'Gestión de Animales'
-BG = "#f4f3ec"
-ACCENT = "#36448B"
-ACCENT_DARK = "#2A3E75"
-TEXT_COLOR = "#222"
+
+BG = "#e7d7c1"          # Fondo beige claro
+ACCENT = "#8b5e3c"      # Café medio
+ACCENT_DARK = "#6b452e" # Café oscuro
+TEXT_COLOR = "#000000"  # Café muy oscuro
+BTN_LIGHT = "#a9825a"   # Café claro
+BTN_DARK = "#7a563b"    # Café fuerte
+
 # --- Conexión a la base de datos ---
 def conectar_bd():
     try:
         conn = mariadb.connect(
-        host='localhost',
-        user='AdminGanaderia',
-        password='2025',
-        database='Proyecto_Ganaderia'
+            host='localhost',
+            user='AdminGanaderia',
+            password='2025',
+            database='Proyecto_Ganaderia'
         )
         cursor = conn.cursor()
-        print("Conexión exitosa a la base de datos.")
         messagebox.showinfo("Conexión", "Conexión exitosa a la base de datos.")
         return conn, cursor
     except mariadb.Error as e:
         messagebox.showerror("Error de conexión", f"No se pudo conectar:\n{e}")
         return None, None
-    
-class Ventana_Animales(tk.Toplevel):  # ← hereda de Toplevel, no Frame
+
+
+class Ventana_Animales(tk.Toplevel):
     def __init__(self, master=None):
         super().__init__(master)
         self.title(APP_TITLE)
         self.geometry("700x500")
         self.config(bg=BG)
-
-        # --- PANEL DE BOTONES CRUD ---
-        panel = tk.Frame(self, bg=BG)
-        panel.pack(pady=10)
-
-        botones = [
-            ("Registrar Animal", ACCENT, self.registrar_animal),
-            ("Modificar Animal", ACCENT, self.modificar_animal),
-            ("Eliminar Animal", "#B33A3A", self.eliminar_animal),
-            ("Consultar Animales", ACCENT_DARK, self.consultar_animales)
-        ]
-
-        for texto, color, comando in botones:
-            tk.Button(
-                panel, text=texto, command=comando,
-                bg=color, fg="white", activebackground=ACCENT_DARK,
-                relief="flat", padx=16, pady=10,
-                font=("Arial", 10, "bold"), cursor="hand2", width=20
-            ).pack(pady=6)
-
         # --- FORMULARIO ---
         form = tk.LabelFrame(
             self, text="Formulario de Animales",
@@ -72,29 +56,64 @@ class Ventana_Animales(tk.Toplevel):  # ← hereda de Toplevel, no Frame
         for campo in labels:
             fila = tk.Frame(form, bg=BG)
             fila.pack(fill="x", pady=5)
-            tk.Label(fila, text=campo, bg=BG, fg=TEXT_COLOR, font=("Arial", 10, "bold")).pack(side="left", padx=5)
-            entry = tk.Entry(fila, width=40, relief="solid", justify="center")
+            tk.Label(fila, text=campo, bg=BG, fg=TEXT_COLOR,
+                     font=("Arial", 10, "bold")).pack(side="left", padx=5)
+
+            entry = tk.Entry(
+                fila, width=40, relief="solid",
+                justify="center", bg="#f5e8d8"
+            )
             entry.pack(side="left", padx=10)
             self.campos_animal[campo] = entry
 
-        # --- BOTONES EXTRA ---
-        acciones = tk.Frame(self, bg=BG)
-        acciones.pack(pady=15)
+        # --- PANEL DE BOTONES CRUD ---
+        panel = tk.Frame(self, bg=BG)
+        panel.pack(pady=15)
 
-        tk.Button(
-            acciones, text="Limpiar Campos",
-            command=self.limpiar_campos_animal,
-            bg="#6c757d", fg="white", relief="flat",
-            padx=20, pady=8, font=("Arial", 10, "bold"),
-            cursor="hand2"
-        ).pack(side="left", padx=10)
+        botones = [
+            ("Registrar Animal", BTN_LIGHT, self.registrar_animal),
+            ("Modificar Animal", BTN_LIGHT, self.modificar_animal),
+            ("Eliminar Animal", BTN_DARK, self.eliminar_animal),
+            ("Consultar Animales", ACCENT_DARK, self.consultar_animales)
+        ]
+
+        for texto, color, comando in botones:
+            tk.Button(
+                panel, text=texto, command=comando,
+                bg=color, fg="white",
+                activebackground=ACCENT_DARK,
+                activeforeground="white",
+                relief="flat", padx=18, pady=10,
+                font=("Arial", 11, "bold"),
+                cursor="hand2", width=22,
+                bd=0, highlightthickness=0
+            ).pack(pady=6)
+
+        
+        # --- BOTÓN INFERIOR ---
+        acciones = tk.Frame(self, bg=BG)
+        acciones.pack(pady=20)
+
+        botones_abajo = [
+            ("Limpiar Campos", BTN_DARK, self.limpiar_campos_animal)
+        ]
+
+        for texto, color, comando in botones_abajo:
+            tk.Button(
+                acciones, text=texto, command=comando,
+                bg=color, fg="white",
+                activebackground=ACCENT_DARK,
+                relief="flat", padx=22, pady=10,
+                font=("Arial", 10, "bold"),
+                cursor="hand2", width=20
+            ).pack(side="left", padx=10)
 
     # --- LIMPIAR CAMPOS ---
     def limpiar_campos_animal(self):
         for entry in self.campos_animal.values():
             entry.delete(0, tk.END)
 
-    # --- CRUD: REGISTRAR ---
+    # --- REGISTRAR ---
     def registrar_animal(self):
         conn, cursor = conectar_bd()
         if not conn:
@@ -112,8 +131,10 @@ class Ventana_Animales(tk.Toplevel):  # ← hereda de Toplevel, no Frame
 
             sql = """INSERT INTO Animales (nombre, fecha_nacimiento, cruze, fk_productor, fk_raza)
                      VALUES (%s, %s, %s, %s, %s)"""
+
             cursor.execute(sql, (nombre, fecha, cruze, fk_productor or None, fk_raza or None))
             conn.commit()
+
             messagebox.showinfo("Éxito", f"Animal '{nombre}' registrado correctamente.")
             self.limpiar_campos_animal()
 
@@ -122,7 +143,7 @@ class Ventana_Animales(tk.Toplevel):  # ← hereda de Toplevel, no Frame
         finally:
             conn.close()
 
-    # --- CRUD: MODIFICAR ---
+    # --- MODIFICAR ---
     def modificar_animal(self):
         conn, cursor = conectar_bd()
         if not conn:
@@ -141,6 +162,7 @@ class Ventana_Animales(tk.Toplevel):  # ← hereda de Toplevel, no Frame
             sql = """UPDATE Animales
                      SET nombre=%s, fecha_nacimiento=%s, cruze=%s, fk_productor=%s, fk_raza=%s
                      WHERE pk_animal=%s"""
+
             cursor.execute(sql, (nombre, fecha, cruze, fk_productor or None, fk_raza or None, pk))
             conn.commit()
 
@@ -153,7 +175,7 @@ class Ventana_Animales(tk.Toplevel):  # ← hereda de Toplevel, no Frame
         finally:
             conn.close()
 
-    # --- CRUD: ELIMINAR ---
+    # --- ELIMINAR ---
     def eliminar_animal(self):
         conn, cursor = conectar_bd()
         if not conn:
@@ -179,7 +201,7 @@ class Ventana_Animales(tk.Toplevel):  # ← hereda de Toplevel, no Frame
         finally:
             conn.close()
 
-    # --- CRUD: CONSULTAR ---
+    # --- CONSULTAR ---
     def consultar_animales(self):
         conn, cursor = conectar_bd()
         if not conn:
@@ -195,6 +217,7 @@ class Ventana_Animales(tk.Toplevel):  # ← hereda de Toplevel, no Frame
 
             cols = ("ID", "Nombre", "Fecha Nac.", "Cruze", "FK Productor", "FK Raza")
             tabla = ttk.Treeview(ventana, columns=cols, show="headings", height=15)
+
             for c in cols:
                 tabla.heading(c, text=c)
                 tabla.column(c, anchor="center", width=120)
@@ -203,7 +226,9 @@ class Ventana_Animales(tk.Toplevel):  # ← hereda de Toplevel, no Frame
                 tabla.insert("", "end", values=fila)
 
             tabla.pack(padx=10, pady=10, fill="both", expand=True)
+
         except mariadb.Error as e:
             messagebox.showerror("Error", f"No se pudo consultar:\n{e}")
         finally:
             conn.close()
+
