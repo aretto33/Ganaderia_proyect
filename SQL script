@@ -193,3 +193,30 @@ SELECT * FROM Pesajes;
 
 -- Ventas
 SELECT * FROM Ventas;
+
+--New COLUMN
+DESCRIBE usuarios;
++------------+--------------+------+-----+---------+----------------+
+| Field      | Type         | Null | Key | Default | Extra          |
++------------+--------------+------+-----+---------+----------------+
+| id_usuario | int(11)      | NO   | PRI | NULL    | auto_increment |
+| usuario    | varchar(50)  | NO   | UNI | NULL    |                |
+| password   | varchar(100) | NO   |     | NULL    |                |
+| rol        | varchar(50)  | NO   |     | NULL    |                |
++------------+--------------+------+-----+---------+----------------+
+
+--Triggers
+ALTER TABLE Animales
+ADD COLUMN peso_actual FLOAT DEFAULT NULL;
+
+DROP TRIGGER IF EXISTS actualizar_peso;
+DELIMITER $$
+CREATE TRIGGER actualizar_peso
+AFTER INSERT ON Pesajes
+FOR EACH ROW
+BEGIN
+UPDATE Animales
+SET peso_actual = NEW.pesaje
+WHERE pk_animal = NEW.fk_animal;
+END $$
+DELIMITER ;
