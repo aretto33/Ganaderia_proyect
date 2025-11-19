@@ -205,6 +205,13 @@ DESCRIBE usuarios;
 | rol        | varchar(50)  | NO   |     | NULL    |                |
 +------------+--------------+------+-----+---------+----------------+
 
+CREATE TABLE usuarios (
+id_usuario INT(11) PRIMARY KEY AUTO_INCREMENT,
+usuario VARCHAR(50) UNIQUE NOT NULL,
+password VARCHAR(100) NOT NULL,
+rol VARCHAR(50) NOT NULL
+);
+
 --Triggers
 ALTER TABLE Animales
 ADD COLUMN peso_actual FLOAT DEFAULT NULL;
@@ -220,3 +227,44 @@ SET peso_actual = NEW.pesaje
 WHERE pk_animal = NEW.fk_animal;
 END $$
 DELIMITER ;
+
+--Procedure 1
+DELIMITER $$
+
+CREATE OR REPLACE PROCEDURE Datos_reAretado(
+    IN p_nombre VARCHAR(50),
+    IN p_idPredio INT,
+    IN p_idProductor INT
+)
+BEGIN
+    DROP TEMPORARY TABLE IF EXISTS Datos_reAretado_result;
+
+    CREATE TEMPORARY TABLE Datos_reAretado_result AS
+    SELECT
+        a.pk_animal,
+        a.nombre,
+        a.cruze,
+        a.sexo,
+        a.peso_actual,
+        p.pk_productor,
+        CONCAT(p.nombre, ' ', p.apellido_pat, ' ', p.apellido_mat) AS Productor,
+        p.UPP,
+        pr.pk_predio,
+        pr.direccion,
+        pr.estado,
+        pr.municipio
+    FROM Animales a
+    INNER JOIN Productores p ON a.fk_productor = p.pk_productor
+    INNER JOIN Predios pr ON p.fk_predio = pr.pk_predio
+    WHERE a.nombre LIKE CONCAT('%', p_nombre, '%')
+      AND p.pk_productor = p_idProductor
+      AND pr.pk_predio = p_idPredio;
+
+    --  ESTA LÍNEA ES LA QUE FALTABA
+    SELECT * FROM Datos_reAretado_result;
+END $$
+
+DELIMITER ;
+
+
+
